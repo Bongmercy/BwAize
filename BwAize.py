@@ -348,7 +348,7 @@ def show_teacher_dashboard():
     st.markdown("")
 
     # Tabs
-    tab_post, tab_attendance, tab_learners, tab_teachers = st.tabs([
+    tab_post, tab_attendance, tab_learners = st.tabs([
         "📢  Post notes & announcements",
         "📋  Attendance register",
         "👥  Manage learners"
