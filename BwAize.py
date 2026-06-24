@@ -348,7 +348,7 @@ def show_teacher_dashboard():
     st.markdown("")
 
     # Tabs
-    tab_post, tab_attendance, tab_learners = st.tabs([
+    tab_post, tab_attendance, tab_learners, tab_teachers = st.tabs([
         "📢  Post notes & announcements",
         "📋  Attendance register",
         "👥  Manage learners"
@@ -495,6 +495,41 @@ def show_teacher_dashboard():
                     st.success(f"✅ {new_name} added with ID {new_id}.")
                     st.rerun()
 
+    # ── Tab 4: Manage teachers ───────────────────────────────────────────────
+    with tab_teachers:
+        st.markdown('<div class="section-header">Enrolled teachers</div>', unsafe_allow_html=True)
+
+        teachers = get_teachers_in_class(user["class"])
+        for tid, tdata in teachers.items():
+            st.markdown(f"""
+            <div class="card">
+                <div class="card-title">{tdata['name']}</div>
+                <div class="card-meta">Teacher ID: {tid} · {tdata['class']}</div>
+            </div>""", unsafe_allow_html=True)
+
+        st.markdown('<div class="section-header">Add a new teacher</div>', unsafe_allow_html=True)
+        new_name = st.text_input("Full name",    placeholder="e.g. Thabo Sithole")
+        new_id   = st.text_input("Teacher ID",   placeholder="e.g. TCH001")
+        new_pass = st.text_input("Set password", placeholder="Teacher's login password", type="password")
+
+        if st.button("Add teacher →", use_container_width=True):
+            if not new_name or not new_id or not new_pass:
+                st.error("Please fill in all fields.")
+            else:
+                users = load_json(USERS_FILE, {})
+                if new_id in users:
+                    st.error("A teacher with that ID already exists.")
+                else:
+                    users[new_id] = {
+                        "name":       new_name,
+                        "role":       "teacher",
+                        "password":   hash_password(new_pass),
+                        "class":      user["class"],
+                        "student_id": new_id,
+                    }
+                    save_json(USERS_FILE, users)
+                    st.success(f"✅ {new_name} added with ID {new_id}.")
+                    st.rerun()
 
 # ══════════════════════════════════════════════════════════════════════════════
 # LEARNER DASHBOARD
